@@ -1,0 +1,32 @@
+{
+  "name": "lernfeld8_burggraf",
+  "productName": "lernfeld8_burggraf",
+  "version": "0.0.1",
+  "description": "Lernfeld 8 Projekt (Burggraf)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\"",
+    "build": "electron-packager . --overwrite --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName='Lernfeld 8 by Jupp, Jonas, Niklas, Henning'"
+  },
+  "keywords": [],
+  "author": {
+    "name": "juppxyz",
+    "email": "privat@jupp.xyz"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-rpm": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
+    "electron": "24.3.0"
+  }
+}
