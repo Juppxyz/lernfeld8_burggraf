@@ -1,11 +1,238 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lernfeld 8</title>
-    <link rel="stylesheet" href="index.css" />
-  </head>
-  <body>
+<head>
+  <style>
+    body {
+      background-color: #262626;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+    }
 
-  </body>
+    .box {
+      background-color: #363636;
+      border-radius: 25px;
+      width: 300px;
+      padding: 20px;
+      box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .box h1 {
+      color: #b8a284;
+      text-align: center;
+    }
+
+    .box input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin: auto 0 20px;
+      border-radius: 5px;
+      border: 1px solid #b8a284;
+      background-color: #555555;
+      color: #ffffff;
+    }
+
+    .box button {
+      transition: 0.2s ease-in;
+      width: 45%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 2%;
+      background-color: #777777;
+    }
+
+    .box button:active {
+      transition: 0.2s ease-in;
+      transform: translateY(2px);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 17px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #777777;
+      transition: .4s;
+      border-radius: 17px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 13px;
+      width: 13px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #ffffff;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #666666;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(13px);
+    }
+
+    #daten-box {
+      background-color: #363636;
+      border-radius: 25px;
+      min-width: 300px;
+      padding: 20px;
+      margin-left: 4%;
+      display: none;
+      box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #666666;
+      text-align: left;
+      padding: 8px;
+      color: #ffffff;
+    }
+
+    th {
+      background-color: #666666;
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="box">
+  <h1>ITSystemHausDD GmbH</h1>
+  <div style="display: block">
+    <p id="text-type">Kunde</p>
+    <label class="switch">
+      <input type="checkbox" id="type-auswahl-switch">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <input style="margin-top: 4%" type="text" placeholder="Suche..." id="search-bar">
+  <div style="display: flex">
+    <button type="button" id="search-button">Suchen</button>
+    <button type="button" id="all-button">Alle anzeigen</button>
+  </div>
+
+</div>
+
+<div class="box2" id="daten-box">
+  <h2 id="error-text"></h2>
+  <table id="daten-tabelle">
+    <tr id="header">
+      <!-- Definieren Sie hier den Tabellenkopf -->
+      <th id="th1">ID</th>
+      <th id="th2">Name</th>
+      <th id="th3">Adresse</th>
+      <th id="th4">Telefon</th>
+    </tr>
+  </table>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let currentType = "Kunde";
+    document.getElementById('type-auswahl-switch').addEventListener('change', function() {
+      document.getElementById('daten-box').style.display = "none";
+      if (currentType === "Kunde"){
+        currentType = "Produkt";
+        document.getElementById("text-type").innerHTML = "Produkt";
+        document.getElementById("th2").innerHTML = "Kategorie"
+        document.getElementById("th3").innerHTML = "Produktname"
+        document.getElementById("th4").innerHTML = "Preis"
+      }else {
+        document.getElementById("text-type").innerHTML = "Kunde"
+        document.getElementById("th2").innerHTML = "Name"
+        document.getElementById("th3").innerHTML = "Adresse"
+        document.getElementById("th4").innerHTML = "Telefon"
+        currentType = "Kunde"
+      }
+      console.log('Type-Status geändert: ' + currentType);
+    });
+
+    async function createTable(data) {
+      document.getElementById('daten-box').style.display = "flex";
+      const table = document.getElementById('daten-tabelle');
+
+      function clearTable() {
+        let rowCount = table.rows.length;
+        for (let i = rowCount - 1; i > 0; i--) {
+          table.deleteRow(i);
+        }
+      }
+      clearTable()
+
+      for(let i = 0; i < data.length; i++) {
+        const row = document.createElement('tr');
+        const values = Object.values(data[i]);
+        for (const v in values) {
+          let nameCell = document.createElement('td');
+          nameCell.textContent = values[v];
+          console.log(v)
+          row.appendChild(nameCell);
+        }
+        table.appendChild(row);
+      }
+
+
+    }
+
+    async function alleAnzeigen() {
+      const data = await window.backend.databaseData(`Alle-${currentType}`)
+      if (data === null) {
+        document.getElementById("error-text").innerHTML = "Ein Fehler ist aufgetreten";
+      }
+      await createTable(data.data)
+    }
+
+    async function suchen() {
+      const data = await window.backend.databaseData(`${document.getElementById("search-bar").value}-${currentType}`);
+      if (data === null) {
+        document.getElementById("error-text").innerHTML = "Ein Fehler ist aufgetreten";
+      }
+      await createTable(data.data)
+    }
+
+
+    document.getElementById('search-button').addEventListener('click', async function() {
+      await suchen()
+    });
+
+    document.getElementById('all-button').addEventListener('click', async function() {
+     await alleAnzeigen()
+    });
+  })
+</script>
+</body>
 </html>
